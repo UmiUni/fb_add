@@ -1,0 +1,4 @@
+pyAutoGui
+mouse
+scipy
+numpy
