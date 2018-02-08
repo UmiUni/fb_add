@@ -51,6 +51,7 @@ def locateAll(needleImage, haystackImage, grayscale=False, limit=None):
 
     needleWidth, needleHeight = needleImage.size
     haystackWidth, haystackHeight = haystackImage.size
+    print("needle image and haystack image dimensions:")
     print(needleWidth, needleHeight)
     print(haystackWidth, haystackHeight)
     needleImageData = tuple(needleImage.getdata()) # TODO - rename to needleImageData??
@@ -63,6 +64,14 @@ def locateAll(needleImage, haystackImage, grayscale=False, limit=None):
     assert [len(row) for row in needleImageRows] == [needleWidth] * needleHeight
 
     numMatchesFound = 0
+    needleImageR, needleImageG, needleImageB, _ = needleImageData[0]
+    print("needle image / fb blue rgb:")
+    print(needleImageR, needleImageG, needleImageB)
+    off = 10    # tolerance on rgb diff between hay and need image.
+    r_range = range(needleImageR - off, needleImageR + off)
+    g_range = range(needleImageG - off, needleImageG + off)
+    b_range = range(needleImageB - off, needleImageB + off)
+    print (r_range, g_range, b_range)
     print("start searching")
     y = 0
     matchx = 0
@@ -72,24 +81,29 @@ def locateAll(needleImage, haystackImage, grayscale=False, limit=None):
         #for matchx in _kmp(needleImageFirstRow, haystackImageData[y * haystackWidth:(y+1) * haystackWidth]):
             pixel = haystackImageData[y*haystackWidth + matchx]
             #print(matchx, y)
-            if (pixel[2] > 190 or pixel[2] < 150 or pixel[0] > 80 or pixel[0] < 40 or pixel[1] < 90 or pixel[1] > 120):
+            if (pixel[0] not in r_range 
+                or pixel[1] not in g_range 
+                or pixel[2] not in b_range):
                 matchx += 1
                 continue
             foundMatch = True
             # then test row by row
             sim = 0
+            '''
             for searchy in range(1, needleHeight):
                 haystackStart = (searchy + y) * haystackWidth + matchx
                 curNeedleImageRow = needleImageData[searchy * needleWidth:(searchy + 1) * needleWidth]
                 curHaystackImageRow = haystackImageData[haystackStart:haystackStart + needleWidth]
 
-                '''
-                if curNeedleImageRow != curHaystackImageRow:
-                    foundMatch = False
-                    break
-                '''
+                
+                # abs match
+                #if curNeedleImageRow != curHaystackImageRow:
+                    #foundMatch = False
+                    #break
+                
                 #print (len(curNeedleImageRow))
                 #print(len(curHaystackImageRow))
+
                 try:
                     #print (curNeedleImageRow[0])
                     sim += 1 - spatial.distance.cosine([row[0] for row in curNeedleImageRow],
@@ -101,7 +115,7 @@ def locateAll(needleImage, haystackImage, grayscale=False, limit=None):
 
             if (sim / (needleHeight - 1)/2 < .9):
                 foundMatch = False
-
+            '''
             if foundMatch:
                 # Match found, report the x, y, width, height of where the matching region is in haystack.
                 numMatchesFound += 1
