@@ -74,16 +74,16 @@ def locateAll(needleImage, haystackImage, grayscale=False, limit=None):
     print (r_range, g_range, b_range)
     print("start searching")
     y = 0
-    matchx = 0
     while y < haystackHeight:
-        foundMatch = True
+        matchx = 0
+        foundMatch = False
         while matchx < haystackWidth:
         #for matchx in _kmp(needleImageFirstRow, haystackImageData[y * haystackWidth:(y+1) * haystackWidth]):
-            pixel = haystackImageData[y*haystackWidth + matchx]
-            #print(matchx, y)
-            if (pixel[0] not in r_range 
-                or pixel[1] not in g_range 
-                or pixel[2] not in b_range):
+            r,g,b = haystackImageData[y*haystackWidth + matchx]
+            #print(r, g, b, matchx, y)
+            if (r not in r_range
+                or g not in g_range
+                or b not in b_range):
                 matchx += 1
                 continue
             foundMatch = True

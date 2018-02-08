@@ -1,6 +1,7 @@
 from PIL import Image
 from PIL import ImageOps
 import pyautogui
+import time
 
 '''
 needleImage = "button_add_friend.png"
@@ -11,7 +12,7 @@ needleImageData = tuple(needleImage.getdata())
 print(needleWidth, needleHeight)
 print(len(needleImageData))
 '''
-
+'''
 # test move
 print(pyautogui.size())
 haystackImage = pyautogui.screenshot()
@@ -19,6 +20,7 @@ haystackWidth, haystackHeight = haystackImage.size
 print(haystackWidth, haystackHeight)
 haystackImage.save('my_screenshot.png')
 pyautogui.moveTo(1000, 226, duration=.5)
+'''
 
 # test locate pixel on haystack
 '''
@@ -26,21 +28,15 @@ haystackImage = pyautogui.screenshot()
 haystackWidth, haystackHeight = haystackImage.size
 #haystackImageData = tuple(haystackImage.getdata())
 haystackImageData = haystackImage.load()
-pix_set = set([]) 
-for pix in haystackImageData:
-	pix_set.add(pix) 
-print (pix_set)
-'''
-#print(haystackImageData[])
-'''
+
 for y in range(haystackHeight):
-	for x in range(haystackWidth):
-		r, g, b, _ = haystackImageData[x,y]
-		if b in range(168 , 188) \
-			and g in range(93 , 113) \
-			and r in range(56 , 76):
-			print(x,y)
-			pyautogui.moveTo(x,y)
+    for x in range(haystackWidth):
+        r, g, b = haystackImageData[x,y]
+        if b in range(168 , 188) and g in range(93 , 113) and r in range(56 , 76):
+            print(x,y)
+            pyautogui.moveTo(x,y)
+            time.sleep(.2)
+            break
 #pixel = haystackImageData[510*haystackWidth + 1200]
 #print(pixel)
 '''
