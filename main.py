@@ -27,9 +27,9 @@ print(len(set(locations)))
 while(True):
     for location in locateAllOnScreen('screenshots/button_add_friend_test.png', grayscale=False):
         print(location)
-        #button_x, button_y, _, _ = location#pyautogui.center(location)
-        #pyautogui.moveTo(button_x, button_y, duration=1)
-        #pyautogui.click(button_x, button_y)
+        button_x, button_y, _, _ = location#pyautogui.center(location)
+        pyautogui.moveTo(button_x, button_y, duration=.1)
+        pyautogui.click(button_x, button_y)
     break
     pyautogui.scroll(-screenHeight)
 

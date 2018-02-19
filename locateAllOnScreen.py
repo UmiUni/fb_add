@@ -1,148 +1,95 @@
-import pyautogui
-from scipy import spatial
-from PIL import Image
-from PIL import ImageOps
+def getRgbRange(pixel, off=10):
+	return [range(channel - off, channel + off) for channel in pixel[:-2]]
 
-''' copy from the original pkg for easier customize'''
+def inRgbRange(pixel, rgb_range):
+	if isinstance(pixel, list):
+		# test every channel
+		for p, r in zip(pixel, rgb_range):
+			if p not in r:
+				return False
+		return True
+	else:
+		if pixel not in rgb_range:
+			return False
+		return True
 
-def _kmp(needle, haystack): # Knuth-Morris-Pratt search algorithm implementation (to be used by screen capture)
-    # build table of shift amounts
-    shifts = [1] * (len(needle) + 1)
-    shift = 1
-    for pos in range(len(needle)):
-        while shift <= pos and needle[pos] != needle[pos-shift]:
-            shift += shifts[pos-shift]
-        shifts[pos+1] = shift
+# general util to test if two rectangles are similar
+def isSimilar(rect1, rect2):
+	pass
 
-    # do the actual search
-    startPos = 0
-    matchLen = 0
-    for c in haystack:
-        while matchLen == len(needle) or \
-              matchLen >= 0 and needle[matchLen] != c:
-            startPos += shifts[matchLen]
-            matchLen -= shifts[matchLen]
-        matchLen += 1
-        if matchLen == len(needle):
-            yield startPos
+def search(x, y, haystackImageData, haystackImage, needleImage, rgb_range, candidate, ret, visited):
+	haystackWidth, haystackHeight = haystackImage.size
+	#你还是要找矩形
+	if x >= haystackWidth or y >= haystackHeight or visited[y][x]:
+		#print('bc')
+		#print (visited[y][x])
+		#print (y, x)
+		return
 
-'''
-to find the buttons, slide a window with the size as a button on the screen
-similar to number of islands idea but our islands are fixed size, as FB friend cards have fixed sizes.
-Then I do a dot product on the red and green channels, but not working properly.
-'''
+	if not inRgbRange(haystackImageData[x, y], rgb_range):
+		#print (y,x)
+		#print ('wow')
+		visited[y][x] = True
+		return
+
+	visited[y][x] = True
+	#print (y,x)
+	if (x+1 >= haystackWidth or not inRgbRange(haystackImageData[x+1, y], rgb_range)) \
+		and (y+1 >= haystackHeight or not inRgbRange(haystackImageData[x, y+1], rgb_range)):
+		#print (y,x)
+		candidate.append(x); candidate.append(y)
+		if isSimilar(haystackImage.crop(tuple(candidate)), needleImage):
+			ret.append(candidate)
+		return
+
+	search(x+1, y, haystackImageData, haystackWidth, haystackHeight, needleImage, rgb_range, candidate, ret, visited)
+	#print('after first recursion')
+	#print (y,x)
+	search(x, y+1, haystackImageData, haystackWidth, haystackHeight, needleImage, rgb_range, candidate, ret, visited)
+	#print('after 2nd recursion')
+	#print (y,x)
+
+	return
+
+
 def locateAll(needleImage, haystackImage, grayscale=False, limit=None):
-    needleFileObj = None
-    haystackFileObj = None
-    if isinstance(needleImage, str):
-        # 'image' is a filename, load the Image object
-        needleFileObj = open(needleImage, 'rb')
-        needleImage = Image.open(needleFileObj)
-    if isinstance(haystackImage, str):
-        # 'image' is a filename, load the Image object
-        haystackFileObj = open(haystackImage, 'rb')
-        haystackImage = Image.open(haystackFileObj)
+	needleFileObj = None
+	haystackFileObj = None
+	if isinstance(needleImage, str):
+		# 'image' is a filename, load the Image object
+		needleFileObj = open(needleImage, 'rb')
+		needleImage = Image.open(needleFileObj)
+	if isinstance(haystackImage, str):
+		# 'image' is a filename, load the Image object
+		haystackFileObj = open(haystackImage, 'rb')
+		haystackImage = Image.open(haystackFileObj)
 
-    #needleImage = None
-    #haystackImage = None
-    if grayscale:
-        needleImage = ImageOps.grayscale(needleImage)
-        haystackImage = ImageOps.grayscale(haystackImage)
+	if grayscale:
+		needleImage = ImageOps.grayscale(needleImage)
+		haystackImage = ImageOps.grayscale(haystackImage)
 
-    needleWidth, needleHeight = needleImage.size
-    haystackWidth, haystackHeight = haystackImage.size
-    print("needle image and haystack image dimensions:")
-    print(needleWidth, needleHeight)
-    print(haystackWidth, haystackHeight)
-    needleImageData = tuple(needleImage.getdata()) # TODO - rename to needleImageData??
-    haystackImageData = tuple(haystackImage.getdata())
-
-    needleImageRows = [needleImageData[y * needleWidth:(y+1) * needleWidth] for y in range(needleHeight)] # LEFT OFF - check this
-    needleImageFirstRow = needleImageRows[0]
-
-    assert len(needleImageFirstRow) == needleWidth
-    assert [len(row) for row in needleImageRows] == [needleWidth] * needleHeight
-
-    numMatchesFound = 0
-    needleImageR, needleImageG, needleImageB, _ = needleImageData[0]
-    print("needle image / fb blue rgb:")
-    print(needleImageR, needleImageG, needleImageB)
-    off = 10    # tolerance on rgb diff between hay and need image.
-    r_range = range(needleImageR - off, needleImageR + off)
-    g_range = range(needleImageG - off, needleImageG + off)
-    b_range = range(needleImageB - off, needleImageB + off)
-    print (r_range, g_range, b_range)
-    print("start searching")
-    y = 0
-    while y < haystackHeight:
-        matchx = 0
-        foundMatch = False
-        while matchx < haystackWidth:
-        #for matchx in _kmp(needleImageFirstRow, haystackImageData[y * haystackWidth:(y+1) * haystackWidth]):
-            r,g,b = haystackImageData[y*haystackWidth + matchx]
-            #print(r, g, b, matchx, y)
-            if (r not in r_range
-                or g not in g_range
-                or b not in b_range):
-                matchx += 1
-                continue
-            foundMatch = True
-            # then test row by row
-            sim = 0
-            '''
-            for searchy in range(1, needleHeight):
-                haystackStart = (searchy + y) * haystackWidth + matchx
-                curNeedleImageRow = needleImageData[searchy * needleWidth:(searchy + 1) * needleWidth]
-                curHaystackImageRow = haystackImageData[haystackStart:haystackStart + needleWidth]
-
-                
-                # abs match
-                #if curNeedleImageRow != curHaystackImageRow:
-                    #foundMatch = False
-                    #break
-                
-                #print (len(curNeedleImageRow))
-                #print(len(curHaystackImageRow))
-
-                try:
-                    #print (curNeedleImageRow[0])
-                    sim += 1 - spatial.distance.cosine([row[0] for row in curNeedleImageRow],
-                                                       [row[0] for row in curHaystackImageRow])
-                    sim += 1 - spatial.distance.cosine([row[1] for row in curNeedleImageRow],
-                                                       [row[1] for row in curHaystackImageRow])
-                except ValueError:
-                    print (len(curHaystackImageRow))
-
-            if (sim / (needleHeight - 1)/2 < .9):
-                foundMatch = False
-            '''
-            if foundMatch:
-                # Match found, report the x, y, width, height of where the matching region is in haystack.
-                numMatchesFound += 1
-                yield (matchx, y, needleWidth, needleHeight)
-                matchx += needleWidth
-                if limit is not None and numMatchesFound >= limit:
-                    # Limit has been reached. Close file handles.
-                    if needleFileObj is not None:
-                        needleFileObj.close()
-                    if haystackFileObj is not None:
-                        haystackFileObj.close()
-            else:
-                matchx += 1
+	needleWidth, needleHeight = needleImage.size
+	haystackWidth, haystackHeight = haystackImage.size
+	needleImageData = needleImage.load()
+	haystackImageData = haystackImage.load()
 
 
-        if foundMatch:
-            y += needleHeight
-        else:
-            y += 1
-
-    # There was no limit or the limit wasn't reached, but close the file handles anyway.
-    if needleFileObj is not None:
-        needleFileObj.close()
-    if haystackFileObj is not None:
-        haystackFileObj.close()
+	numMatchesFound = 0
+	rgb_range = getRgbRange(needleImageData[0,0])
+	print (r_range, g_range, b_range)
 
 
+	print("start searching")
+	button_list = []
+	visited = [[False for i in range(haystackWidth)] for j in range(haystackHeight)]
+	for y in range(haystackHeight):
+		for x in range(haystackWidth):
+			if (not visited[y][x]) and inRgbRange(haystackImageData[x, y], rgb_range):
+				search(x, y, haystackImage, haystackHeight, needleImage, rgb_range, [x,y], button_list, visited)
+			else:
+				visited[y][x] = True
+
+	print (button_list)
 
 def locateAllOnScreen(image, grayscale=False, limit=None, region=None):
     screenshotIm = pyautogui.screenshot(region=region)
