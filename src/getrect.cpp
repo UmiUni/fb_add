@@ -3,6 +3,7 @@
 #include<vector>
 #include<unordered_set>
 #include<cassert>
+#include <Python.h>
 
 using namespace std;
 

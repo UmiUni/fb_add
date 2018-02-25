@@ -3,7 +3,7 @@ from PIL import ImageOps
 import pyautogui
 import time
 import numpy as np
-from untitled import *
+from locateAllOnScreen import *
 '''
 needleImage = "button_add_friend.png"
 needleFileObj = open(needleImage, 'rb')
@@ -80,27 +80,20 @@ haystackImageData = haystackImage.load()
 print (haystackImageData[0,0])
 '''
 
-
+'''
 # white 255, black 0
 pixels = np.array([[0,0,255,255,0,255], [0,0,255,255,0,255], [0,0,255,255,0,255], [0,0,255,255,0,0]])
 pixels = pixels.astype('uint8')
-'''
-haystackImage = Image.new('L', (6,4))
-haystackImage.putdata(pixels)
+
+# haystackImage = Image.new('L', (6,4))
+# haystackImage.putdata(pixels)
 # I think this way you need to save onto disk and then read back, although absurd.
-'''
+
 haystackImage = Image.fromarray(pixels)
-#haystackImage.show()
+haystackImage.show()
 
 haystackWidth, haystackHeight = haystackImage.size
 haystackImageData = haystackImage.load()
-
-'''
-for x in range(haystackHeight):
-	for y in range(haystackWidth):
-		print(haystackImageData[y,x])
-# !! index by [y,x]
-'''
 
 rgb_range = range(200,256)	# capture white
 button_list = []
@@ -108,11 +101,20 @@ button_list = []
 # visited = [[False]*haystackWidth]*haystackHeight
 visited = [[False for i in range(haystackWidth)] for j in range(haystackHeight)]
 for y in range(haystackHeight):
-	for x in range(haystackWidth):
-		if (not visited[y][x]) and inRgbRange(haystackImageData[x, y], rgb_range):
-			print (visited[3][1])
-			search(x, y, haystackImageData, haystackWidth, haystackHeight, None, rgb_range, [x,y], button_list, visited)
-		else:
-			visited[y][x] = True
+    for x in range(haystackWidth):
+        if (not visited[y][x]) and inRgbRange(haystackImageData[x, y], rgb_range):
+            candidate = [x,y,0,0]
+            search(x, y, haystackImageData, haystackImage, None, rgb_range, candidate, visited)
+            button_list.append(candidate)
+        else:
+            visited[y][x] = True
 
 print (button_list)
+'''
+
+# test processBinary 
+needleImageFile = 'screenshots/button_add_friend_test.png'
+needleFileObj = open(needleImageFile, 'rb')
+needleImage = Image.open(needleFileObj)
+rgb_range = [range(56, 76), range(93, 113), range(168, 188)] # capture white
+processBinary(needleImage, rgb_range)
