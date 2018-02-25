@@ -45,10 +45,10 @@ class GetRectangles:
                 if self._map[i][j]:
                     island = self._getIsland(i, j)
                     left = island[:, 1].min()
-                    right = island[:, 1].max()
+                    right = island[:, 1].max() + 1
                     top = island[:, 0].min()
-                    bottom = island[:, 0].max()
-                    rectangles.append([top, left, bottom+1-top, right+1-left])
+                    bottom = island[:, 0].max() + 1
+                    rectangles.append([top, bottom, left, right])
         return np.array(rectangles)
         
     def reset(self, img, color=(0, 0, 0), tol=(10, 10, 10), channel=3):
