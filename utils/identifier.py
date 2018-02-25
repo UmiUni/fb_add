@@ -17,10 +17,10 @@ class SimpleIdentifier:
         self._max_height = maxh
         self._min_height = minh
         self._max_width = maxw
-        self._min_wodtj = minw
+        self._min_width = minw
         self._refs = []
         for ref in references:
-            self._ref.append(resize(ref, (height, width), mode='constant', preserve_range=True))
+            self._refs.append(resize(ref, (height, width), mode='constant', preserve_range=True))
     
     def _isTarget(self, crop, threshold):
         '''
@@ -28,7 +28,8 @@ class SimpleIdentifier:
         '''
         crop = resize(crop, (self._height, self._width), mode='constant', preserve_range=True)
         for ref in self._refs:
-            diff = (crop-ref).resize(self._height * self._width)
+            #diff = (crop-ref).reshape(self._height * self._width * 3)
+            diff = (crop-ref).flatten()
             if np.dot(diff, diff) <= threshold:
                 return True
         return False
