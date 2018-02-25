@@ -6,7 +6,6 @@ import numpy as np
 from utils.rect import GetRectangles
 from utils.identifier import SimpleIdentifier
 from PIL import Image
-from PIL import ImageOps
 
 '''
 im1 = pyautogui.screenshot()
@@ -29,9 +28,10 @@ if isinstance(needleImage, str):
 	# 'image' is a filename, load the Image object
 	needleFileObj = open(needleImage, 'rb')
 	needleImage = Image.open(needleFileObj)
+	#needleImage.show()
 # convert to numpy array and remove alpha
 needleImage = np.array(needleImage)[:,:,:3]
-SimpleIdentifier = SimpleIdentifier([needleImage])
+SimpleIdentifier = SimpleIdentifier([needleImage], 64, 512)
 
 while(True):
 	haystackImage = pyautogui.screenshot()
@@ -41,17 +41,18 @@ while(True):
 		haystackFileObj = open(haystackImage, 'rb')
 		haystackImage = Image.open(haystackFileObj)
 	haystackImage = np.array(haystackImage)[:,:,:3]
-	
+
+	#print ( tuple(needleImage[0,0]))	#(66, 103, 178)
 	getRect = GetRectangles(haystackImage, tuple(needleImage[0,0]))
 	rects = getRect.getRectangles()
-	target_rects = SimpleIdentifier.getTargetPositions(haystackImage, rects, 7*(10**7))
+	target_rects = SimpleIdentifier.getTargetPositions(haystackImage, rects, 1*(10**1))
 	print (target_rects)
 
 	for location in target_rects:
 		#print(location)
 		button_x, button_y = location#pyautogui.center(location)
-		pyautogui.moveTo(button_y/2, button_x/2, duration=.5)
-		#pyautogui.click(button_y/2, button_x/2)
+		pyautogui.moveTo(button_y, button_x, duration=.5)
+		#pyautogui.click(button_y/2, button_x/2)	#for mac
 	pyautogui.scroll(-15)
 
 

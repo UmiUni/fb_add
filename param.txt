@@ -1,0 +1,13 @@
+yicheng's mac
+the size to resize to
+default
+THRESHOLD
+7*(10**7)
+
+yicheng's win
+the size to resize to
+64, 512
+THRESHOLD
+1*(10**1)
+
+mac need to divide pixels by 2 to locate

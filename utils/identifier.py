@@ -1,5 +1,6 @@
 import numpy as np
-from skimage.transform import resize
+#from skimage.transform import resize
+import scipy.misc
 
 class SimpleIdentifier:
     ''' Determine weither rectangles are "add friend" '''
@@ -20,13 +21,13 @@ class SimpleIdentifier:
         self._min_width = minw
         self._refs = []
         for ref in references:
-            self._refs.append(resize(ref, (height, width), mode='constant', preserve_range=True))
+            self._refs.append(scipy.misc.imresize(ref, (height, width)))
     
     def _isTarget(self, crop, threshold):
         '''
         Determine whether a rectangle is a "add friend" button
         '''
-        crop = resize(crop, (self._height, self._width), mode='constant', preserve_range=True)
+        crop = scipy.misc.imresize(crop, (self._height, self._width))
         for ref in self._refs:
             #diff = (crop-ref).reshape(self._height * self._width * 3)
             diff = (crop-ref).flatten()
