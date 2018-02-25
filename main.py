@@ -44,15 +44,14 @@ while(True):
 	
 	getRect = GetRectangles(haystackImage, tuple(needleImage[0,0]))
 	rects = getRect.getRectangles()
-	target_rects = SimpleIdentifier.getTargetPositions(haystackImage, rects, 5*10**7)
+	target_rects = SimpleIdentifier.getTargetPositions(haystackImage, rects, 7*(10**7))
 	print (target_rects)
 
 	for location in target_rects:
 		#print(location)
 		button_x, button_y = location#pyautogui.center(location)
 		pyautogui.moveTo(button_y/2, button_x/2, duration=.5)
-		#pyautogui.click(button_x, button_y)
-	break
-	pyautogui.scroll(-screenHeight)
+		#pyautogui.click(button_y/2, button_x/2)
+	pyautogui.scroll(-15)
 
 

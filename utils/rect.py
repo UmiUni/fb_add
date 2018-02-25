@@ -7,7 +7,7 @@ class GetRectangles:
     _steps = [(1, 0), (0, 1), (-1, 0), (0, -1)]
     _map = None
     
-    def __init__(self, img, color=(0, 0, 0), tol=(10, 10, 10), channel=3):
+    def __init__(self, img, color=(0, 0, 0), tol=(10, 10, 5), channel=3):
         '''
         Convert the original image into a 0, 1 map
         '''
