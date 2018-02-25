@@ -50,3 +50,12 @@ class GetRectangles:
                     bottom = island[:, 0].max()
                     rectangles.append([top, left, bottom+1-top, right+1-left])
         return np.array(rectangles)
+        
+    def reset(self, img, color=(0, 0, 0), tol=(10, 10, 10), channel=3):
+        '''
+        reset image
+        '''
+        assert channel == img.shape[2] == len(color) == len(tol)
+        self._map = np.ones(img.shape[:2]).astype(np.int16)
+        for i in range(channel):
+            self._map = (self._map&(img[:,:,i] >= color[i]-tol[i])&(img[:,:,i]<= color[i]+tol[i])).astype(np.int16)
