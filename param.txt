@@ -1,3 +1,4 @@
+# browser screens should fill the display
 yicheng's mac
 the size to resize to
 default
@@ -9,5 +10,9 @@ the size to resize to
 64, 512
 THRESHOLD
 1*(10**1)
+SCROLL
+-1100
+BROWSER
+chrome 80%
 
 mac need to divide pixels by 2 to locate

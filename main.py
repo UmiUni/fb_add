@@ -5,6 +5,7 @@ import time
 import numpy as np
 from utils.rect import GetRectangles
 from utils.identifier import SimpleIdentifier
+from utils.misc import *
 from PIL import Image
 
 '''
@@ -22,7 +23,7 @@ print(len(set(locations)))
 
 # click every button on the page and then scroll
 # need to know how much I can scroll down
-needleImage = 'screenshots/button_add_friend_test.png'
+needleImage = 'add_friend_button/button_add_friend_test.png'
 needleFileObj = None
 if isinstance(needleImage, str):
 	# 'image' is a filename, load the Image object
@@ -48,11 +49,18 @@ while(True):
 	target_rects = SimpleIdentifier.getTargetPositions(haystackImage, rects, 1*(10**1))
 	print (target_rects)
 
+	ctr = 0
 	for location in target_rects:
 		#print(location)
 		button_x, button_y = location#pyautogui.center(location)
 		pyautogui.moveTo(button_y, button_x, duration=.5)
 		#pyautogui.click(button_y/2, button_x/2)	#for mac
-	pyautogui.scroll(-15)
+		#pyautogui.moveTo(button_y-163, button_x-40, duration=.5)
+		nameBox = haystackImage[button_x-40 : button_x+40, button_y-163 : button_y-26]
+		Image.fromarray(nameBox).save('name_box/'+str(ctr)+'.png', "PNG") #show()
+		print (ocr(nameBox))
+		ctr += 1
+	break
+	#pyautogui.scroll(-1100)
 
 
