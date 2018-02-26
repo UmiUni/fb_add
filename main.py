@@ -7,6 +7,7 @@ from utils.rect import GetRectangles
 from utils.identifier import SimpleIdentifier
 from utils.misc import *
 from PIL import Image
+import win32clipboard
 
 '''
 im1 = pyautogui.screenshot()
@@ -32,7 +33,7 @@ if isinstance(needleImage, str):
 	#needleImage.show()
 # convert to numpy array and remove alpha
 needleImage = np.array(needleImage)[:,:,:3]
-SimpleIdentifier = SimpleIdentifier([needleImage], 64, 512)
+SimpleIdentifier = SimpleIdentifier([needleImage], needleImage.shape[0], needleImage.shape[1])
 
 while(True):
 	haystackImage = pyautogui.screenshot()
@@ -46,7 +47,7 @@ while(True):
 	#print ( tuple(needleImage[0,0]))	#(66, 103, 178)
 	getRect = GetRectangles(haystackImage, tuple(needleImage[0,0]))
 	rects = getRect.getRectangles()
-	target_rects = SimpleIdentifier.getTargetPositions(haystackImage, rects, 1*(10**1))
+	target_rects = SimpleIdentifier.getTargetPositions(haystackImage, rects, 1.2*(10**1))
 	print (target_rects)
 
 	ctr = 0
@@ -55,10 +56,22 @@ while(True):
 		button_x, button_y = location#pyautogui.center(location)
 		pyautogui.moveTo(button_y, button_x, duration=.5)
 		#pyautogui.click(button_y/2, button_x/2)	#for mac
-		#pyautogui.moveTo(button_y-163, button_x-40, duration=.5)
-		nameBox = haystackImage[button_x-40 : button_x+40, button_y-163 : button_y-26]
-		Image.fromarray(nameBox).save('name_box/'+str(ctr)+'.png', "PNG") #show()
-		print (ocr(nameBox))
+		pyautogui.moveTo(button_y-163, button_x-40, duration=.5)
+		nameBox = haystackImage[button_x-60 : button_x+60, button_y-280 : button_y-60]
+		#Image.fromarray(nameBox).show()#save('name_box/'+str(ctr)+'.png', "PNG") #show()
+		if (ocr(nameBox)):
+			'''
+			pyautogui.click(button='right')
+			for i in range (5):
+				pyautogui.press('down')
+			pyautogui.press('enter')
+			win32clipboard.OpenClipboard()
+			data = win32clipboard.GetClipboardData()
+			win32clipboard.CloseClipboard()
+			print (data)
+			'''
+			pass
+			#pyautogui.click(button_y, button_x)	#for mac
 		ctr += 1
 	break
 	#pyautogui.scroll(-1100)
