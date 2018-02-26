@@ -7,7 +7,7 @@ from utils.rect import GetRectangles
 from utils.identifier import SimpleIdentifier
 from utils.misc import *
 from PIL import Image
-import win32clipboard
+#import win32clipboard
 
 '''
 im1 = pyautogui.screenshot()
