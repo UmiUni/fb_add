@@ -52,36 +52,44 @@ while(True):
 	haystackImage = np.array(haystackImage)[:,:,:3]
 
 	#print ( tuple(needleImage[0,0]))	#(66, 103, 178)
-	fbBlue = tuple(needleImage[2,2])
+	fbBlue_addButton = tuple(needleImage[2, 2])
 	#fbBlue = (66, 103, 178)
-	print(fbBlue)
-	getRect = GetRectangles(haystackImage, fbBlue)
+	print(fbBlue_addButton)
+	fbBlue_nameBox = (54,88,153);
+	getRect = GetRectangles(haystackImage, fbBlue_addButton)
 	rects = getRect.getRectangles()
 	target_rects = SimpleIdentifier.getTargetPositions(haystackImage, rects)
 	print (target_rects)
 
 	ctr = 0
-	for location in target_rects:
+	for target_rect in target_rects:
 		#print(location)
-		button_x, button_y = location#pyautogui.center(location)
-		pyautogui.moveTo(button_y, button_x, duration=.5)
+		button_x, button_y = getCenter(target_rect)#pyautogui.center(location)
+		pyautogui.moveTo(button_x, button_y, duration=.5)
 		#pyautogui.click(button_y/2, button_x/2)	#for mac
 		try:
-			pyautogui.moveTo(button_y-250, button_x-60, duration=.5)
-		# 	nameBox = haystackImage[button_x-60 : button_x+60, button_y-250 : button_y-20]
-		# except ValueError:
-		# 	continue
-		#Image.fromarray(nameBox).show()#save('name_box/'+str(ctr)+'.png', "PNG") #show()
-		# try:
-		# 	isChinese = ocr(nameBox)
+			top, bottom, left, right = target_rect
+			height, width = getDim(target_rect)
+			# move to add friend button top left corner
+			nameBoxRight = int(button_x - width / 2)
+			nameBoxLeft = int(nameBoxRight - width * 1.8)
+			nameBoxTop = int(button_y - height / 2 - height * 1.5)
+			nameBoxButtom = int(button_y + height / 2 + height * 1.5)
+			nameBox = haystackImage[nameBoxTop : nameBoxButtom, nameBoxLeft : nameBoxRight]
+		except ValueError:
+		 	continue
+		Image.fromarray(nameBox)#.show()#save('name_box/'+str(ctr)+'.png', "PNG") #show()
+		try:
+			isChinese = ocr(nameBox)
 		except ValueError:
 			continue
-		# if (isChinese):
-			#pyautogui.moveTo(findFirstBlue(nameBox, button_x-60, button_y-250, fbBlue)[::-1], duration=.5)
-			# pyautogui.click(button='right')
-			# for i in range (5):
-			# 	pyautogui.press('down')
-			# pyautogui.press('enter')
+		if (isChinese):
+			print ("yes")
+			pyautogui.moveTo(findFirstBlue(nameBox, nameBoxLeft, nameBoxTop, fbBlue_nameBox), duration=.5)
+			pyautogui.click(button='right')
+			for i in range (5):
+				pyautogui.press('down')
+			pyautogui.press('enter')
 			# win32clipboard.OpenClipboard()
 			# data = win32clipboard.GetClipboardData()
 			# win32clipboard.CloseClipboard()
@@ -89,6 +97,7 @@ while(True):
 			# pass
 			#pyautogui.click(button_y, button_x)	#for mac
 		ctr += 1
+		break
 	break
 	#pyautogui.scroll(-1100)
 

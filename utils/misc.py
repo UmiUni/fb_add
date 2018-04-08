@@ -9,7 +9,7 @@ def ocr(img):
     ret = pytesseract.image_to_string(Image.fromarray(img))
     if (len(ret) == 0):
         return False
-    print(ret)
+    # print(ret)
     ret = re.sub(r'[^a-z0-9 ]', ' ', ret.lower())
     surname = ret.split(' ')
     print(surname)
@@ -21,14 +21,29 @@ def ocr(img):
         return False
 
 def findFirstBlue(nameBox, x0, y0, fbBlue):
-    print(fbBlue)
-    height, width,_ = nameBox.shape
+    height, width, _ = nameBox.shape
+    print(height, width)
     for i in range(height):
         for j in range(width):
             find = True
+            #print(nameBox[i][j][0], nameBox[i][j][1], nameBox[i][j][2])
             for c in range(3):
-                find = find and abs(nameBox[i][j][c] - fbBlue[c]) < 1
-            if (find):
-                print (i,j)
-                return [x0+i, y0+j]
+                find = find and (abs(nameBox[i][j][c] - fbBlue[c]) < 5)
+            #print(find)
+            if find == True:
+                break
+        if find == True:
+            break
+    if find == True:
+        return [x0+j, y0+i]
     raise Exception('NameBox error', 'cannot find fb blue so cannot find name')
+
+"""Assume rect is a list [top, bottom, left, right]"""
+def getCenter (rect):
+    top, bottom, left, right = rect
+    return [int((left + right) / 2), int((top + bottom) / 2),]
+
+'''return [height, width]'''
+def getDim (rect):
+    top, bottom, left, right = rect
+    return [bottom - top, right - left]

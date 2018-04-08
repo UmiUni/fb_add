@@ -15,5 +15,10 @@ Implementation
 
 Find _add friend_ button: implemented as find the squares with the special ratio. 
 
-Check if Chinese:  implemented as using Google's OCR tool but not reliable plus requires browser resolution.
+Find _name box_ : implemented as move a relative distance from the center because the box element on the website is fixed.
 
+Check if Chinese:  implemented as using Google's OCR tool but not reliable plus requires browser resolution > 125%.
+
+Requirement
+
+raise Exception after each step so as to stop wild behavior 

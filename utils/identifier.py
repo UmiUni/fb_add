@@ -50,7 +50,7 @@ class SimpleIdentifier:
                 continue
             if (right-left < self._min_width) or (right-left > self._max_width):
                 continue
-            target_positions.append([int((top + bottom) / 2), int((left + right) / 2)])
+            target_positions.append([top, bottom, left, right])
         return target_positions
 
         # min_diff = 10 ** 8
