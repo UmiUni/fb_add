@@ -1,4 +1,5 @@
 import pytesseract
+import re
 from PIL import Image
 
 # need some tanwan surname
@@ -8,9 +9,26 @@ def ocr(img):
     ret = pytesseract.image_to_string(Image.fromarray(img))
     if (len(ret) == 0):
         return False
-    surname = ret[0].split(' ')[-1]
     print(ret)
-    if (surname in chinese_surname_list):
+    ret = re.sub(r'[^a-z0-9 ]', ' ', ret.lower())
+    surname = ret.split(' ')
+    print(surname)
+    if (surname[0] in chinese_surname_list
+        or surname[1] in chinese_surname_list):
+        #or surname[2] in chinese_surname_list):
         return True
     else:
         return False
+
+def findFirstBlue(nameBox, x0, y0, fbBlue):
+    print(fbBlue)
+    height, width,_ = nameBox.shape
+    for i in range(height):
+        for j in range(width):
+            find = True
+            for c in range(3):
+                find = find and abs(nameBox[i][j][c] - fbBlue[c]) < 1
+            if (find):
+                print (i,j)
+                return [x0+i, y0+j]
+    raise Exception('NameBox error', 'cannot find fb blue so cannot find name')

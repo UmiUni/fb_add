@@ -3,7 +3,7 @@ from PIL import ImageOps
 import pyautogui
 import time
 import numpy as np
-from locateAllOnScreen import *
+
 '''
 needleImage = "button_add_friend.png"
 needleFileObj = open(needleImage, 'rb')
@@ -112,9 +112,15 @@ for y in range(haystackHeight):
 print (button_list)
 '''
 
-# test processBinary 
-needleImageFile = 'screenshots/button_add_friend_test.png'
-needleFileObj = open(needleImageFile, 'rb')
-needleImage = Image.open(needleFileObj)
-rgb_range = [range(56, 76), range(93, 113), range(168, 188)] # capture white
-processBinary(needleImage, rgb_range)
+# test rect
+'''
+places = [[33, 653], [121, 26], [121, 546], [445, 130], [662, 48], [688, 555], [705, 607], [708, 587], [709, 590], [712,
+586], [740, 583], [1053, 121], [1056, 131]]
+for p in places:
+    pyautogui.moveTo(p[0], p[1],.5)
+'''
+
+# test pyautogui.locateOnScreen
+for location in pyautogui.locateAllOnScreen('add_friend_button/35.png'):
+    x,y = pyautogui.center(location)
+    pyautogui.click(x,y)
