@@ -66,16 +66,16 @@ while(True):
 		button_x, button_y = location#pyautogui.center(location)
 		pyautogui.moveTo(button_y, button_x, duration=.5)
 		#pyautogui.click(button_y/2, button_x/2)	#for mac
-		# try:
-		# 	pyautogui.moveTo(button_y-250, button_x-60, duration=.5)
+		try:
+			pyautogui.moveTo(button_y-250, button_x-60, duration=.5)
 		# 	nameBox = haystackImage[button_x-60 : button_x+60, button_y-250 : button_y-20]
 		# except ValueError:
 		# 	continue
 		#Image.fromarray(nameBox).show()#save('name_box/'+str(ctr)+'.png', "PNG") #show()
 		# try:
 		# 	isChinese = ocr(nameBox)
-		# except ValueError:
-		# 	continue
+		except ValueError:
+			continue
 		# if (isChinese):
 			#pyautogui.moveTo(findFirstBlue(nameBox, button_x-60, button_y-250, fbBlue)[::-1], duration=.5)
 			# pyautogui.click(button='right')
