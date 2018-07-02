@@ -10,6 +10,8 @@ from PIL import Image
 # pip install win32clipboard
 import win32clipboard
 from collections import deque
+import random
+from utils import gui_bot
 
 '''
 im1 = pyautogui.screenshot()
@@ -54,13 +56,14 @@ for depth in range(3):
         pyautogui.hotkey('ctrl', 'l')
         # print (list(curPage))
         pyautogui.press(list(curPage))
-        time.sleep(2)
-        if (curPage != 'https://www.facebook.com/superchaoran/friends'):
-            pyautogui.press('enter')
+        time.sleep(random.uniform(0.5, 2))
+        pyautogui.press('enter')
+        time.sleep(random.uniform(1.5, 4))
 
         noFriendFoundCtr = 0
         while (noFriendFoundCtr < 5):
             haystackImage = pyautogui.screenshot()
+            print(haystackImage.size)
             haystackFileObj = None
             if isinstance(haystackImage, str):
                 # 'image' is a filename, load the Image object
@@ -71,7 +74,7 @@ for depth in range(3):
             # print ( tuple(needleImage[0,0]))	#(66, 103, 178)
             fbBlue_addButton = tuple(needleImage[2, 2])
             # fbBlue = (66, 103, 178)
-            print(fbBlue_addButton)
+            # print(fbBlue_addButton)
             fbBlue_nameBox = (54, 88, 153);
             getRect = GetRectangles(haystackImage, fbBlue_addButton)
             rects = getRect.getRectangles()
@@ -83,8 +86,8 @@ for depth in range(3):
             for target_rect in target_rects:
                 # print(location)
                 button_x, button_y = getCenter(target_rect)  # pyautogui.center(location)
-                pyautogui.moveTo(button_x, button_y, duration=.5)
-                # pyautogui.click(button_y/2, button_x/2)	#for mac
+                gui_bot.random_move_to(button_x, button_y)
+
                 try:
                     top, bottom, left, right = target_rect
                     height, width = getDim(target_rect)
@@ -103,7 +106,8 @@ for depth in range(3):
                     continue
                 if (isChinese):
                     print("yes")
-                    pyautogui.moveTo(findFirstBlue(nameBox, nameBoxLeft, nameBoxTop, fbBlue_nameBox), duration=.5)
+                    name_x, name_y = findFirstBlue(nameBox, nameBoxLeft, nameBoxTop, fbBlue_nameBox)
+                    gui_bot.random_move_to(name_x, name_y)
                     # copy link
                     pyautogui.click(button='right')
                     for i in range(5):
@@ -117,11 +121,15 @@ for depth in range(3):
                     # print (friend_id)
                     # add to queue
                     friendIdQ.append(friend_id)
-                # pyautogui.click(button_y, button_x)	#for mac
+                    #pyautogui.click(button_y, button_x)
                 noFriendFound = False
             # ctr += 1
             # break
             if (noFriendFound == True):
                 noFriendFoundCtr += 1
-            pyautogui.scroll(-1000)
-            time.sleep(1)
+            del haystackImage
+            del getRect
+            del rects
+            del target_rects
+            pyautogui.scroll(random.randrange(-1500, -500))
+            time.sleep(random.uniform(0.5, 2))

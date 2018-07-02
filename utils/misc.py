@@ -16,7 +16,6 @@ def ocr(img):
     print(name)
     for part in name:
         if (part in chinese_surname_list):
-            print(part)
             return True
     else:
         return False
